@@ -1,0 +1,60 @@
+/*
+@import "./assets/css/boostrap.min.css";
+@import "./assets/css/bootstrap-select.min.css";
+@import "./assets/css/nouislider.min.css";
+@import "./assets/css/swiper-bundle.min.css";
+@import "./assets/css/styles.css";
+@import "./assets/fonts/font-icons.css";
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;  
+ 
+
+.Toastify__toast-body > div:last-child {
+  width: 400px !important;
+  font-size: 16px !important;
+  font-family: PelakFA !important;
+}
+
+
+.form-check-lo {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+
+   
+  .content-send {
+    flex: 1;
+  }
+
+  .cancel-button {
+    background-color: red;
+    color: white;
+    padding: 5px;
+    border-radius: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    align-self: flex-start;
+    margin-top: 10px;
+  }
+
+  @media (min-width: 768px) {
+    .form-check-lo {
+      flex-direction: row;
+      align-items: center;
+    }
+
+   
+
+    .content-send {
+      flex: 1;
+    }
+
+    
+  }

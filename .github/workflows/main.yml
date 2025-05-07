@@ -1,0 +1,80 @@
+name: SAFINO FRONT
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install rsync
+        run: sudo apt-get install -y rsync
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.5.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy code
+        uses: easingthemes/ssh-deploy@v2.2.5
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TARGET: ${{ secrets.REMOTE_TARGET }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+
+      - name: Run Pm2
+        run: |
+          ssh  -p ${{ secrets.REMOTE_PORT }} root@${{ secrets.REMOTE_HOST }} "
+          pwd
+            cd ${{ secrets.REMOTE_TARGET }}
+            ls
+            echo $SHELL
+            whoami
+            rm -rf .next
+            sed -i 's|http://localhost:8000|https://api.safinoapp.ir|g' .env
+            npm i
+            npm i -g next
+            npm run build
+            pm2 restart safino
+          "
+
+      # - name: Send Telegram Notification
+      #   env:
+      #     TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      #     TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      #     EVENT_NAME: ${{ github.event_name }}
+      #     COMMIT_SHA: ${{ github.sha }}
+      #     WORKFLOW: ${{ github.workflow }}
+      #     JOB_STATUS: ${{ job.status }}
+      #   run: |
+      #     MESSAGE="$WORKFLOW $COMMIT_SHA"
+      #     CURL_COMMAND="curl -sS -X POST \
+      #       https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage \
+      #       -d chat_id=$TELEGRAM_CHAT_ID \
+      #       -d message_thread_id=30 \
+      #       -d text=\"$MESSAGE\""
+
+      #     # Run the curl command
+      #     eval $CURL_COMMAND
+
+      # - name: Send Telegram Notification
+      #   uses: appleboy/telegram-action@master
+      #   with:
+      #     to: ${{ secrets.TELEGRAM_CHAT_ID }}
+      #     token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      #     message: |
+
+      #       🚀 Deployment 🚀
+
+      #       Event: ${{ github.event_name }}
+      #       Commit: ${{ github.sha }}
+      #       Workflow: ${{ github.workflow }}
+      #       Status: ${{ job.status }}
